@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +28,7 @@ public class MainActivity extends Activity implements View.OnClickListener
     private BluetoothAdapter bluetoothAdapter;
     private Connected connected;
     private BluetoothSocket mmSocket;
+    private Toast toast = null;
     private byte[] bytes = {'m', 0, 0, 0, 0, '\n'};
 
     @Override
@@ -52,7 +52,7 @@ public class MainActivity extends Activity implements View.OnClickListener
     protected void onStart() {
         super.onStart();
         if (bluetoothAdapter.isEnabled()){
-            enableButton.setText("蓝牙已打开");
+            showTextToast("蓝牙已打开");
         }
         registerBluetoothReceiver();
         enableButton.setOnClickListener(this);
@@ -75,7 +75,7 @@ public class MainActivity extends Activity implements View.OnClickListener
                     connected.write(bytes);
                 }
                 else
-                    Toast.makeText(MainActivity.this, "请先连接设备", Toast.LENGTH_SHORT).show();
+                    showTextToast("请先连接设备");
             }
 
             @Override
@@ -108,7 +108,7 @@ public class MainActivity extends Activity implements View.OnClickListener
                 if (connected!=null){
                     connected.write(bytes);
                 }else
-                    Toast.makeText(MainActivity.this, "请先连接设备", Toast.LENGTH_SHORT).show();
+                    showTextToast("请先连接设备");
             }
 
             @Override
@@ -151,11 +151,11 @@ public class MainActivity extends Activity implements View.OnClickListener
 
     private void connectBluetooth() {
         if (!bluetoothAdapter.isEnabled()){
-            Toast.makeText(this, "请先打开蓝牙", Toast.LENGTH_SHORT).show();
+            showTextToast("请先打开蓝牙");
             return;
         }
         if (connected!=null){
-            Toast.makeText(MainActivity.this, "已连接", Toast.LENGTH_SHORT).show();
+            showTextToast("已连接");
             return;
         }
         List<String> pairedDevicesName = new ArrayList<>();
@@ -195,6 +195,17 @@ public class MainActivity extends Activity implements View.OnClickListener
         dialogBuilder.show();
         Toast.makeText(this, "提示：若想连接新设备请先前往设置配对", Toast.LENGTH_LONG).show();
     }
+
+    private void showTextToast(String msg) {
+        if (toast == null) {
+            toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
+            toast.show();
+        } else {
+            toast.setText(msg);
+        }
+        toast.show();
+    }
+
 
     @Override
     public void onClick(View v) {
